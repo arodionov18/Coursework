@@ -11,21 +11,16 @@ struct AbstractLayerParams {
     std::string prev_layer;
     std::string next_layer;
 
-    AbstractLayerParams(const std::string& name_, const std::string& type_, const std::string& prev_layer_, const std::string& next_layer_) 
-                        : name(name_), type(type_), prev_layer(prev_layer_), next_layer(next_layer_) {
-    }
+    AbstractLayerParams(const std::string& name_, const std::string& type_, const std::string& prev_layer_, const std::string& next_layer_);
 
-    AbstractLayerParams(const AbstractLayerParams& rhs) : name(rhs.name), type(rhs.type), prev_layer(rhs.prev_layer), next_layer(rhs.next_layer) {
-    }
+    AbstractLayerParams(const AbstractLayerParams& rhs);
 };
 
 
 class AbstractLayer {
 public:
     virtual ~AbstractLayer() = default;
-    AbstractLayer(std::unique_ptr<AbstractLayerParams> params) : params_(std::move(params)) {
-    }
-
+    AbstractLayer(std::unique_ptr<AbstractLayerParams> params);
 protected:
     std::unique_ptr<AbstractLayerParams> params_;
 };
@@ -35,11 +30,9 @@ struct WeightFiller {
     std::string type;
     double std;
 
-    WeightFiller(const std::string& type_, double std_) : type(type_), std(std_) {
-    }
+    WeightFiller(const std::string& type_, double std_);
 
-    WeightFiller(const WeightFiller& rhs) : type(rhs.type), std(rhs.std) {
-    }
+    WeightFiller(const WeightFiller& rhs);
 };
 
 struct ConvolutionalParams : public AbstractLayerParams {
@@ -51,27 +44,20 @@ struct ConvolutionalParams : public AbstractLayerParams {
     WeightFiller weight_filler;
 
     ConvolutionalParams(const AbstractLayerParams& params, bool bias_term_, int num_output_,
-                        int pad_, int kernel_size_, int stride_, const WeightFiller& weight_filler_)
-                        : AbstractLayerParams(params), bias_term(bias_term_), num_output(num_output_),
-                        pad(pad_), kernel_size(kernel_size_), stride(stride_),
-                        weight_filler(weight_filler_) {
-    }
+                        int pad_, int kernel_size_, int stride_, const WeightFiller& weight_filler_);
 };
 
 struct BatchNormParams : public AbstractLayerParams {
     bool use_global_stats;
     double eps;
 
-    BatchNormParams(const AbstractLayerParams& params, bool stats, double eps_)
-                    : use_global_stats(stats), eps(eps_), AbstractLayerParams(params) {
-    }
+    BatchNormParams(const AbstractLayerParams& params, bool stats, double eps_);
 };
 
 struct ScaleParams : public AbstractLayerParams {
     bool bias_term;
 
-    ScaleParams(const AbstractLayerParams& params, bool term) : AbstractLayerParams(params), bias_term(term) {
-    }
+    ScaleParams(const AbstractLayerParams& params, bool term);
 };
 
 enum Pool { MAX };
@@ -81,13 +67,38 @@ struct PoolingParams : public AbstractLayerParams {
     int kernel_size = 3;
     int stride = 2;
 
-    PoolingParams(AbstractLayerParams base_params, Pool pool_, int kernel_size_, int stride_)
-                : AbstractLayerParams(base_params), pool(pool_), kernel_size(kernel_size_), stride(stride_) {
-    }
+    PoolingParams(AbstractLayerParams base_params, Pool pool_, int kernel_size_, int stride_);
 };
 
 class ConvolutionalLayer : public AbstractLayer {
 public:
-    ConvolutionalLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
-    }
+    ConvolutionalLayer(std::unique_ptr<AbstractLayerParams> params);
+
+private:
+    // unique_ptr<> params;
+};
+
+class BatchNormLayer : public AbstractLayer {
+public:
+    BatchNormLayer(std::unique_ptr<AbstractLayerParams> params);
+
+private:
+    // unique_ptr<> params;
+};
+
+class ScaleLayer : public AbstractLayer {
+public:
+    ScaleLayer(std::unique_ptr<AbstractLayerParams> params);
+
+private:
+};
+
+class ReLuLayer : public AbstractLayer {
+public:
+    ReLuLayer(std::unique_ptr<AbstractLayerParams> params);
+};
+
+class PoolingLayer: public AbstractLayer {
+public:
+    PoolingLayer(std::unique_ptr<AbstractLayerParams> params);
 };

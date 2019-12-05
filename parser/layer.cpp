@@ -52,3 +52,14 @@ AbstractLayer::AbstractLayer(std::unique_ptr<AbstractLayerParams> params) : para
 ConvolutionalLayer::ConvolutionalLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
 }
 
+BatchNormLayer::BatchNormLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
+}
+
+ScaleLayer::ScaleLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
+}
+
+ReLuLayer::ReLuLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
+}
+
+PoolingLayer::PoolingLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
+}
