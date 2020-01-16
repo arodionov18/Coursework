@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package Espresso;
+package Network;
 
 // Specifies the shape (dimensions) of a Blob.
 message BlobShape {

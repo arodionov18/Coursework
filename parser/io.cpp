@@ -69,6 +69,14 @@ bool WriteProtoToBinaryFile(const string& filename, const Message& proto) {
     return result;
 }
 
+void ReadNetParamsFromFile(const string& filename, bool isBinary, NetParameter* parameters) {
+    if (isBinary) {
+        CHECK(ReadProtoFromBinaryFile(filename, parameters)) << "Failed to parse NetParameter file: " << filename;
+    } else {
+        CHECK(ReadProtoFromTextFile(filename, parameters)) << "Failed to parse NetParameter file: " << filename;
+    }
+}
+
 
 } // io
 } // parser

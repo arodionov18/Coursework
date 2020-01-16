@@ -11,7 +11,7 @@
 class ILayerProducer {
 public:
     virtual ~ILayerProducer() = default;
-    virtual std::unique_ptr<AbstractLayer> Produce() = 0;
+    virtual std::unique_ptr<AbstractLayer> Produce(const AbstractLayerParams& params) = 0;
 };
 // ---------------------------------------------------------
 template<class Layer>

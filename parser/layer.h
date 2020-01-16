@@ -17,6 +17,17 @@ struct AbstractLayerParams {
 };
 
 
+enum LayerType {
+    DATA,
+    CONVOLUTIONAL,
+    RELU,
+    POOLING,
+    INNER_PRODUCT,
+    ACCURACY,
+    DROP_OUT,
+    SOFTMAX_LOSS
+};
+
 class AbstractLayer {
 public:
     virtual ~AbstractLayer() = default;
