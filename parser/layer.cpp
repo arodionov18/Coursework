@@ -4,6 +4,27 @@
 
 using namespace Halide;
 
+//  AbstractLayer
+AbstractLayer::AbstractLayer(LayerParameter* params) : m_params(*params) {
+}
+
+ConvolutionalLayer::ConvolutionalLayer(LayerParameter* params) : AbstractLayer(params) {
+}
+
+BatchNormLayer::BatchNormLayer(LayerParameter* params) : AbstractLayer(params) {
+}
+
+ScaleLayer::ScaleLayer(LayerParameter* params) : AbstractLayer(params) {
+}
+
+ReLuLayer::ReLuLayer(LayerParameter* params) : AbstractLayer(params) {
+}
+
+PoolingLayer::PoolingLayer(LayerParameter* params) : AbstractLayer(params) {
+}
+
+
+/*
 //#############   Layer Parameters  ######################
 
 //  AbstractLayerParams
@@ -44,22 +65,4 @@ PoolingParams::PoolingParams(AbstractLayerParams base_params, Pool pool_, int ke
 }
 
 //#############   Layers  ######################
-
-//  AbstractLayer
-AbstractLayer::AbstractLayer(std::unique_ptr<AbstractLayerParams> params) : params_(std::move(params)) {
-}
-
-ConvolutionalLayer::ConvolutionalLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
-}
-
-BatchNormLayer::BatchNormLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
-}
-
-ScaleLayer::ScaleLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
-}
-
-ReLuLayer::ReLuLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
-}
-
-PoolingLayer::PoolingLayer(std::unique_ptr<AbstractLayerParams> params) : AbstractLayer(std::move(params)) {
-}
+*/

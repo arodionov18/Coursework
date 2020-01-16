@@ -1,11 +1,69 @@
 #pragma once
 
+#include "Halide.h"
+#include "generated/caffe.pb.h"
 #include <vector>
 #include <memory>
 #include <string>
 #include <unordered_map>
 
-struct AbstractLayerParams {
+using Network::LayerParameter;
+
+class AbstractLayer {
+public:
+    virtual ~AbstractLayer() = default;
+    AbstractLayer(LayerParameter* params);
+
+    Halide::Func forward;
+    int x, y, z, w;
+
+protected:
+    LayerParameter m_params;
+    Halide::Var i, j, k, l;
+};
+
+class ConvolutionalLayer : public AbstractLayer {
+public:
+    ConvolutionalLayer(LayerParameter* params);
+
+private:
+    LayerParameter m_params;
+};
+
+class BatchNormLayer : public AbstractLayer {
+public:
+    BatchNormLayer(LayerParameter* params);
+
+private:
+    LayerParameter m_params;
+};
+
+class ScaleLayer : public AbstractLayer {
+public:
+    ScaleLayer(LayerParameter* params);
+
+private:
+    LayerParameter m_params;
+};
+
+class ReLuLayer : public AbstractLayer {
+public:
+    ReLuLayer(LayerParameter* params);
+
+private:
+    LayerParameter m_params;
+};
+
+class PoolingLayer: public AbstractLayer {
+public:
+    PoolingLayer(LayerParameter* params);
+
+private:
+    LayerParameter m_params;
+};
+
+
+/*struct AbstractLayerParams {
     std::string name;
     std::string type;
     std::string prev_layer;
@@ -27,15 +85,6 @@ enum LayerType {
     DROP_OUT,
     SOFTMAX_LOSS
 };
-
-class AbstractLayer {
-public:
-    virtual ~AbstractLayer() = default;
-    AbstractLayer(std::unique_ptr<AbstractLayerParams> params);
-protected:
-    std::unique_ptr<AbstractLayerParams> params_;
-};
-
 
 struct WeightFiller {
     std::string type;
@@ -80,36 +129,4 @@ struct PoolingParams : public AbstractLayerParams {
 
     PoolingParams(AbstractLayerParams base_params, Pool pool_, int kernel_size_, int stride_);
 };
-
-class ConvolutionalLayer : public AbstractLayer {
-public:
-    ConvolutionalLayer(std::unique_ptr<AbstractLayerParams> params);
-
-private:
-    // unique_ptr<> params;
-};
-
-class BatchNormLayer : public AbstractLayer {
-public:
-    BatchNormLayer(std::unique_ptr<AbstractLayerParams> params);
-
-private:
-    // unique_ptr<> params;
-};
-
-class ScaleLayer : public AbstractLayer {
-public:
-    ScaleLayer(std::unique_ptr<AbstractLayerParams> params);
-
-private:
-};
-
-class ReLuLayer : public AbstractLayer {
-public:
-    ReLuLayer(std::unique_ptr<AbstractLayerParams> params);
-};
-
-class PoolingLayer: public AbstractLayer {
-public:
-    PoolingLayer(std::unique_ptr<AbstractLayerParams> params);
-};
+*/
