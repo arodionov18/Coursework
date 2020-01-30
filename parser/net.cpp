@@ -6,46 +6,29 @@
 namespace parser {
 namespace net {
 
-unique_ptr<AbstractLayer> ParseAndCreateLayer(NetParameter* parameters) {
+using Network::LayerParameter;
+
+unique_ptr<AbstractLayer> ParseAndCreateLayer(const LayerParameter& parameters) {
     CHECK(!parameters.has_type()) << "Wrong layer";
-    switch (parameters.type()) {
-        case "DATA":
-            auto params = GetDataParams(parameters);
-            break;
+    if (parameters.type() == "DATA")
+            return std::make_unique<DataLayer>(parameters);
+    if (parameters.type() == "CONVOLUTIONAL")
+        return std::make_unique<ConvolutionalLayer>(parameters);
+    if (parameters.type() == "RELU")
+        return std::make_unique<ReLuLayer>(parameters);
+    if (parameters.type() == "POOLING")
+        return std::make_unique<PoolingLayer>(parameters);
+    if (parameters.type() == "INNER_PRODUCT")    
+        return std::make_unique<InnerProductLayer>(parameters);
+    if (parameters.type() == "ACCURACY")    
+        return std::make_unique<AccuracyLayer>(parameters);
+    if (parameters.type() == "DROPOUT")
+        return std::make_unique<DropOutLayer>(parameters);
+    if (parameters.type() == "SOFTMAX_LOSS")    
+        return std::make_unique<SoftMaxLayer>(parameters);
 
-        case "CONVOLUTIONAL":
-            auto params = GetConvolutionalParams(parameters);
-            break;
-        
-        case "RELU":
-            auto params = GetReluParams(parameters);
-            break;
-
-        case "POOLING":
-            auto params = GetPoolingParams(parameters);
-            break;
-        
-        case "INNER_PRODUCT":
-            auto params = GetInnerProductParams(parameters);
-            break;
-        
-        case "ACCURACY":
-            auto params = GetAccuracyParams(parameters);
-            break;
-
-        case "DROPOUT":
-            auto params = GetDropoutParams(parameters);
-            break;
-        
-        case "SOFTMAX_LOSS":
-            auto params = GetSoftMaxParams(parameters);
-            break;
-
-        
-        default:
-            std::cerr << "ERROR: UNKNOWN LAYER TYPE " << parameters.type() << " WITH NAME " << parameters.name() << std::endl;
-            break;
-    }
+    std::cerr << "ERROR: UNKNOWN LAYER TYPE " << parameters.type() << " WITH NAME " << parameters.name() << std::endl;
+    return std::make_unique<AbstractLayer>();
 }
 
 Net::Net(const NetParameter& parameters) {
@@ -62,7 +45,7 @@ void Net::init(const NetParameter& parameters) {
     this->name = parameters.name();
     // TODO
     for (size_t i = 0; i < parameters.layer_size(); ++i) {
-        auto& layer = param.layer(i);
+        auto& layer = parameters.layer(i);
         this->layers.push_back(ParseAndCreateLayer(layer));
     }
 }

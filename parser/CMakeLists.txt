@@ -15,7 +15,6 @@ link_directories(../bin)
 
 find_library(HALIDE_LIBRARY Halide)
 
-
 #PROTOBUF
 FILE(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/proto PROTOMODEL_PATH)
 FILE(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/generated PROTOBINDING_PATH)
@@ -40,6 +39,6 @@ ADD_LIBRARY(protoBinding ${HDRS} ${SRCS})
 # ${PROTOBUF_LIBRARIES} should be defined by FIND_PACKAGE(Protobuf REQUIRED)
 TARGET_LINK_LIBRARIES(protoBinding ${PROTOBUF_LIBRARIES})
 
-add_executable(layer layer.cpp io.cpp main.cpp net.cpp utils.cpp)
-target_link_libraries(layer ${PTHREAD_LIBRARY} ${DL_LIBRARY} ${PROTOBUF} -lHalide protoBinding)
+add_executable(layer layer.cpp io.cpp main.cpp net.cpp)
+target_link_libraries(layer ${PTHREAD_LIBRARY} ${DL_LIBRARY} ${PROTOBUF} -lHalide protoBinding glog)
 
