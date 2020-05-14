@@ -1,6 +1,6 @@
 #pragma once
 
-#include "generated/caffe.pb.h"
+#include "caffe2.pb.h"
 #include <glog/logging.h>
 #include <google/protobuf/message.h>
 
@@ -9,7 +9,6 @@ namespace io {
 
 using google::protobuf::Message;
 using std::string;
-using Network::NetParameter;
 
 static const int kProtoReadBytesLimit = INT_MAX;
 
@@ -19,8 +18,8 @@ bool WriteProtoToTextFile(const Message& proto, const string& filename);
 bool ReadProtoFromBinaryFile(const string& filename, Message* proto);
 void WriteProtoToBinaryFile(const Message& proto, const string& filename);
 
-void ReadNetParamsFromTextFile(const string& param_file, NetParameter* param);
-void ReadNetParamsFromBinaryFile(const string& param_file, NetParameter* param);
+//void ReadNetParamsFromFile(const string& param_file, bool isBinary, NetParameter* param);
+//void ReadNetParamsFromBinaryFile(const string& param_file, NetParameter* param);
 // void ReadSolverParamsFromTextFile(const string& param_file, SolverParameter* param);
 
 } // io

@@ -31,3 +31,18 @@ public:
 private:
     std::unordered_map<std::string, std::unique_ptr<ILayerProducer>> producers_;
 };
+
+class LayerFactory {
+public:
+
+    std::string CreateLayer(LayerParameter parameters); // Create new layer
+
+    bool IsLayerExists() const;
+
+    void DeleteLayer(const std::string& layerName);
+
+    std::unique_ptr<AbstractLayer> GetLayer(const std::string& layerName);
+
+private:
+    std::unordered_map<std::string, std::unique_ptr<AbstractLayer>> layers_;
+}
