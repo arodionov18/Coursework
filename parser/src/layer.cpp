@@ -2,10 +2,6 @@
 
 
 //  AbstractLayer
-AbstractLayer::AbstractLayer(std::weak_ptr<AbstractLayer> input) {
-    if (!input.expired()) {
-        //assert(input->forward.defined());
-
-        input_layer = input;
-    }
+AbstractLayer::AbstractLayer(std::shared_ptr<AbstractLayer> input) {
+    input_layer = input;
 }

@@ -2,8 +2,8 @@
 
 using namespace Halide;
 
-LRNLayer::LRNLayer(const caffe2::OperatorDef& op, std::weak_ptr<AbstractLayer> input) : AbstractLayer(input) {
-    auto layer = input_layer.lock();
+LRNLayer::LRNLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
+    auto layer = input_layer;
     
     Func clamped = BoundaryConditions::constant_exterior(layer->forward, 0.0f, 0, layer->out_dim_size(0), 0, layer->out_dim_size(1), 0, layer->out_dim_size(2));
 

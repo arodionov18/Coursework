@@ -2,18 +2,18 @@
 
 using namespace Halide;
 
-MaxPoolingLayer::MaxPoolingLayer(const caffe2::OperatorDef& op, std::weak_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
-    auto layer = input_layer.lock();
+MaxPoolingLayer::MaxPoolingLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
+    auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() == 4);
 
-    num_samples = layer->out_dim_size(3);
-    in_ch = layer->out_dim_size(2);
-    in_h = layer->out_dim_size(1);
-    in_w = layer->out_dim_size(0);
+    num_samples = layer->out_dim_size(0);
+    in_ch = layer->out_dim_size(1);
+    in_h = layer->out_dim_size(2);
+    in_w = layer->out_dim_size(3);
 
     p_h = op.arg(1).i();
-    p_w = op.arg(0).i(); // CHECK THIS NORMAL
-    stride = op.arg(2).i();
+    p_w = op.arg(1).i(); // CHECK THIS NORMAL
+    stride = op.arg(0).i();
 
     // LOG_ASSERT((in_h - p_h) % stride == 0) << "Bad Hpad";
     // LOG_ASSERT((in_w - p_w) % stride == 0) << "Bad Wpad";
@@ -33,7 +33,7 @@ void MaxPoolingLayer::back_propagate(Func dout) {
     // LOG_ASSERT(dout.defined()) << "dout is not defined yet";
 
     if (!f_in_grad.defined()) {
-        auto layer = input_layer.lock();
+        auto layer = input_layer;
 
         Func pool_argmax;
         RDom r1(0, p_w, 0, p_h);
@@ -60,12 +60,12 @@ int MaxPoolingLayer::out_dim_size(int i) const {
     // LOG_ASSERT(i < 4) << "Wrong input";
 
     int size = 0; // NRVO
-    if (i == 0) {
+    if (i == 3) {
         size = 1 + ((in_w - p_w) / stride);
-    } else if (i == 1) {
-        size = 1 + ((in_h - p_h) / stride);
     } else if (i == 2) {
-        size = input_layer.lock()->out_dim_size(2);
+        size = 1 + ((in_h - p_h) / stride);
+    } else if (i == 1) {
+        size = in_ch;
     } else {
         size = num_samples;
     }

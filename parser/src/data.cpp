@@ -2,7 +2,7 @@
 
 using namespace Halide;
 
-DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(std::weak_ptr<AbstractLayer>()) {
+DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(std::shared_ptr<AbstractLayer>()) {
     in_h = info.h;
     in_w = info.w;
     in_ch = info.channels;
@@ -25,13 +25,13 @@ int DataLayer::out_dims() const {
 int DataLayer::out_dim_size(int i) const {
     switch (i)
     {
-    case 0:
-        return in_w;
-    case 1:
-        return in_h;
-    case 2:
-        return in_ch;
     case 3:
+        return in_w;
+    case 2:
+        return in_h;
+    case 1:
+        return in_ch;
+    case 0:
         return num_samples;
     default:
         // LOG_ASSERT(false) << "BAD INPUT";

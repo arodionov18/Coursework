@@ -8,7 +8,7 @@ class FCLayer : public AbstractLayer {
 public:
     Halide::Var x, y, z, n;
 
-    FCLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b, std::weak_ptr<AbstractLayer> input, int schedule = true);
+    FCLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b, std::shared_ptr<AbstractLayer> input, int schedule = true);
 
     void back_propagate(Halide::Func dout) override;
 

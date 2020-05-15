@@ -13,7 +13,7 @@ public:
     int size;
     float alpha, beta, bias;
 
-    LRNLayer(const caffe2::OperatorDef& op, std::weak_ptr<AbstractLayer> input);
+    LRNLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input);
 
     void back_propagate(Func dout) override;
 

@@ -10,7 +10,7 @@ class ReluLayer: public AbstractLayer {
 public:
     Var x, y, z, n;
 
-    ReluLayer(std::weak_ptr<AbstractLayer> input);
+    ReluLayer(std::shared_ptr<AbstractLayer> input);
 
     void back_propagate(Func dout) override;
 

@@ -2,8 +2,8 @@
 
 using namespace Halide;
 
-DropoutLayer::DropoutLayer(const caffe2::OperatorDef& op, std::weak_ptr<AbstractLayer> input) : AbstractLayer(input) {
-    auto layer = input_layer.lock();
+DropoutLayer::DropoutLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
+    auto layer = input_layer;
 
     ratio = op.arg(0).f(); // ratio
     is_test = op.arg(1).i(); // phase
@@ -60,7 +60,7 @@ void DropoutLayer::back_propagate(Func dout) {
     // LOG_ASSERT(dout.defined()) << "dout is not defined yet";
     // LOG_ASSERT(!is_test) << "BackProp should not be called during testing";
     if (!f_in_grad.defined()) {
-        auto layer = input_layer.lock();
+        auto layer = input_layer;
         switch(layer->out_dims())
         {
         case 1:
@@ -88,9 +88,9 @@ void DropoutLayer::back_propagate(Func dout) {
 }
 
 int DropoutLayer::out_dims() const {
-    return input_layer.lock()->out_dims();
+    return input_layer->out_dims();
 }
 
 int DropoutLayer::out_dim_size(int i) const {
-    return input_layer.lock()->out_dim_size(i);
+    return input_layer->out_dim_size(i);
 }

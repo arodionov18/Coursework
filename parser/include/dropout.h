@@ -13,7 +13,7 @@ public:
 
     Func mask;
 
-    DropoutLayer(const caffe2::OperatorDef& op, std::weak_ptr<AbstractLayer> input);
+    DropoutLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input);
 
     void back_propagate(Func dout) override;
 

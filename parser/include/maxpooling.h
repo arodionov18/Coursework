@@ -17,7 +17,7 @@ public:
     Var par;
     int vec_len = 8;
 
-    MaxPoolingLayer(const caffe2::OperatorDef& op, std::weak_ptr<AbstractLayer> input, int schedule = 1);
+    MaxPoolingLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input, int schedule = 1);
 
     void back_propagate(Func dout) override;
 

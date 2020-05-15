@@ -21,7 +21,7 @@ public:
     Halide::Func forward_clamp;
 
     ConvolutionalLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b,
-     const caffe2::OperatorDef& op, std::weak_ptr<AbstractLayer> input, int schedule = true);
+     const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input, int schedule = true);
 
     void back_propagate(Halide::Func dout) override;
 

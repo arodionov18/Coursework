@@ -2,22 +2,22 @@
 
 using namespace Halide;
 
-FlattenLayer::FlattenLayer(std::weak_ptr<AbstractLayer> input) : AbstractLayer(input) {
-    auto layer = input_layer.lock();
+FlattenLayer::FlattenLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
+    auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() >= 2 && layer->out_dims() <= 4);
 
     if (layer->out_dims() == 2) {
         out_width = layer->out_dim_size(0);
         forward(x, n) = layer->forward(x, n);
     } else if (layer->out_dims() == 3) {
-        int w = layer->out_dim_size(0);
+        int w = layer->out_dim_size(2);
         int h = layer->out_dim_size(1);
         out_width = w * h;
         forward(x, n) = layer->forward(x % w, x / w, n);
     } else if (layer->out_dims() == 4) {
-        int w = layer->out_dim_size(0);
-        int h = layer->out_dim_size(1);
-        int c = layer->out_dim_size(2);
+        int w = layer->out_dim_size(3);
+        int h = layer->out_dim_size(2);
+        int c = layer->out_dim_size(1);
         out_width = w * h * c;
 
         forward(x, n) = layer->forward(x % w, (x / w) % h, x / (w * h), n);
@@ -30,15 +30,15 @@ void FlattenLayer::back_propagate(Func dout) {
     // LOG_ASSERT(dout.defined()) << "dout is not defined yet";
 
     if (!f_in_grad.defined()) {
-        auto layer = input_layer.lock();
+        auto layer = input_layer;
         if (layer->out_dims() == 2) {
             f_in_grad(x, n) = dout(x, n);
         } else if (layer->out_dims() == 3) {
-            int w = layer->out_dim_size(0);
+            int w = layer->out_dim_size(2);
             f_in_grad(x, y, n) = dout(y * w + x, n);
         } else if (layer->out_dims() == 4) {
-            int w = layer->out_dim_size(0);
-            int h = layer->out_dim_size(1);
+            int w = layer->out_dim_size(3);
+            int h = layer->out_dim_size(2);
             f_in_grad(x, y, z, n) = dout(z * w * h + y * w + x, n);
         }
         layer->back_propagate(f_in_grad);

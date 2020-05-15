@@ -13,7 +13,7 @@ public:
     int out_width;
     int num_samples;
 
-    FlattenLayer(std::weak_ptr<AbstractLayer> input);
+    FlattenLayer(std::shared_ptr<AbstractLayer> input);
     
     void back_propagate(Func dout) override;
 

@@ -2,8 +2,8 @@
 
 using namespace Halide;
 
-ReluLayer::ReluLayer(std::weak_ptr<AbstractLayer> input) : AbstractLayer(input) {
-    auto layer = input_layer.lock();
+ReluLayer::ReluLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
+    auto layer = input_layer;
     switch (layer->out_dims())
     {
     case 1:
@@ -24,7 +24,7 @@ ReluLayer::ReluLayer(std::weak_ptr<AbstractLayer> input) : AbstractLayer(input) 
 void ReluLayer::back_propagate(Func dout) {
     // LOG_ASSERT(dout.defined()) << "dout is not defined yet";
     if (!f_in_grad.defined()) {
-        auto layer = input_layer.lock();
+        auto layer = input_layer;
         switch (layer->out_dims())
         {
         case 1:
@@ -49,9 +49,9 @@ void ReluLayer::back_propagate(Func dout) {
 }
 
 int ReluLayer::out_dims() const {
-    return input_layer.lock()->out_dims();
+    return input_layer->out_dims();
 }
 
 int ReluLayer::out_dim_size(int i) const {
-    return input_layer.lock()->out_dim_size(i);
+    return input_layer->out_dim_size(i);
 }

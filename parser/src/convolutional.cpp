@@ -6,17 +6,17 @@
 ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
                                        const caffe2::TensorProto &b,
                                        const caffe2::OperatorDef &op,
-                                       std::weak_ptr<AbstractLayer> input,
+                                       std::shared_ptr<AbstractLayer> input,
                                        int schedule) : AbstractLayer(input)
 {
-    LOG_ASSERT(!input_layer.expired()) << "input layer expired";
-    auto input_layer_ = input_layer.lock();
+    // LOG_ASSERT(!input_layer.expired()) << "input layer expired";
+    auto input_layer_ = input_layer;
     assert(input_layer_->out_dims() == 4);
-    num_samples = input_layer_->out_dim_size(3);
-    in_ch = input_layer_->out_dim_size(2);
-    in_h = input_layer_->out_dim_size(1);
-    in_w = input_layer_->out_dim_size(0);
-
+    num_samples = input_layer_->out_dim_size(0);
+    in_ch = input_layer_->out_dim_size(1);
+    in_h = input_layer_->out_dim_size(2);
+    in_w = input_layer_->out_dim_size(3);
+    std::cout << "Convolutional layer" << std::endl;
     params.push_back(LoadBufferFromTensor(w));
     params.push_back(LoadBufferFromTensor(b));
 
@@ -24,7 +24,7 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
     f_w = params[0].width();
     f_h = params[0].height();
 
-    pad = op.arg(2).i(); // уточнить
+    pad = op.arg(1).i(); // уточнить
     stride = op.arg(0).i();
 
     forward_clamp = Halide::BoundaryConditions::constant_exterior(
@@ -75,13 +75,13 @@ int ConvolutionalLayer::out_dims() const {
 
 int ConvolutionalLayer::out_dim_size(int i) const {
     int size = 0;
-    if (i == 0)
+    if (i == 3)
       size = (1 + (in_w + 2 * pad - f_w) / stride);
-    else if (i == 1)
-      size = (1 + (in_h + 2 * pad - f_h) / stride);
     else if (i == 2)
+      size = (1 + (in_h + 2 * pad - f_h) / stride);
+    else if (i == 1)
       size = num_f;
-    else if (i == 3)
+    else if (i == 0)
       size = num_samples;
     return size;
 }

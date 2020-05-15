@@ -15,9 +15,9 @@ int main(int argc, char** argv) {
 
     parser::net::Net network(network_name, true);
     std::string image_path = argv[3];
-    //network.ReadImage(image_path);
-    //network.LoadWeights(weights_name, true);
-    //network.Init();
+    network.ReadImage(image_path);
+    network.LoadWeights(weights_name, true);
+    network.Init();
 
     google::protobuf::ShutdownProtobufLibrary();
 }

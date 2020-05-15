@@ -8,9 +8,11 @@ class SoftmaxLayer: public AbstractLayer {
 public:
     Var in_dim, n;
 
+    Var a, b;
+
     int num_classes, num_samples;
 
-    SoftmaxLayer(std::weak_ptr<AbstractLayer> input, int schedule = 1);
+    SoftmaxLayer(std::shared_ptr<AbstractLayer> input, int schedule = 1);
 
     Func loss(Func labels);
 

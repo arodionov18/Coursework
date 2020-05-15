@@ -11,7 +11,7 @@ public:
     Var x, y, z, n;
     int num_samples, in_ch, in_h, in_w;
 
-    ConcatLayer(const std::vector<std::weak_ptr<AbstractLayer>>& inputs);
+    ConcatLayer(const std::vector<std::shared_ptr<AbstractLayer>>& inputs);
 
     void back_propagate(Func dout) override;
 

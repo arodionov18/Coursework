@@ -2,18 +2,34 @@
 
 using namespace Halide;
 
-SoftmaxLayer::SoftmaxLayer(std::weak_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
-    auto layer = input_layer.lock();
+SoftmaxLayer::SoftmaxLayer(std::shared_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
+    auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() == 2);
+    std::cout << "Softmax: " << layer->out_dims() << std::endl;
+    for (int i = 0; i < layer->out_dims(); ++i) {
+        std::cout << "Dim " << i << ", " << layer->out_dim_size(i) << std::endl;
+    }
+
+    //Var x, n1;
+    Func fw;
+    if (layer->out_dims() == 4) {
+        int w = layer->out_dim_size(3);
+        int h = layer->out_dim_size(2);
+        int c = layer->out_dim_size(1);
+        // out_width = w * h * c;
+        fw(a, b) = layer->forward(a % w, (a / w) % h, a / (w * h), b);
+    } else {
+        fw(a, b) = layer->forward(a, b);
+    }
 
     num_classes = layer->out_dim_size(0);
     num_samples = layer->out_dim_size(1);
 
     Func exp_max, expo, normalizer;
     RDom r(0, num_classes);
-    exp_max(n) = maximum(layer->forward(r.x, n));
-    expo(in_dim) = exp(layer->forward(in_dim, n) - exp_max(n));
-    normalizer(n) = cast(layer->forward.output_types()[0], 0);
+    exp_max(n) = maximum(fw(r.x, n));
+    expo(in_dim) = exp(fw(in_dim, n) - exp_max(n));
+    normalizer(n) = cast(fw.output_types()[0], 0);
     normalizer(n) += expo(r.x, n);
     forward(in_dim, n) = expo(in_dim, n) / normalizer(n);
 
@@ -34,7 +50,7 @@ void SoftmaxLayer::back_propagate(Func labels) {
         Expr t = (forward(in_dim, n) - 1) / num_samples;
         Expr f = (forward(in_dim, n) / num_samples);
         f_in_grad(in_dim, n) = select(in_dim == label, t, f);
-        input_layer.lock()->back_propagate(f_in_grad);
+        input_layer->back_propagate(f_in_grad);
     }
 }
 

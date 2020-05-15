@@ -12,9 +12,9 @@ using namespace Halide;
 class AbstractLayer {
 public:
     virtual ~AbstractLayer() = default;
-    AbstractLayer(std::weak_ptr<AbstractLayer> input);
+    AbstractLayer(std::shared_ptr<AbstractLayer> input);
 
-    std::weak_ptr<AbstractLayer> input_layer;
+    std::shared_ptr<AbstractLayer> input_layer;
 
     Func forward;
     std::vector<Buffer<float>> params;
