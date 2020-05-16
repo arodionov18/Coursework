@@ -99,6 +99,9 @@ void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::Ten
             string input_name = layer_def.input(0);
             string output_name = layer_def.output(0);
 
+            string flatten_name = input_name + "_FLATTEN";
+            net_outputs[flatten_name] = std::make_shared<FlattenLayer>(net_outputs[input_name]);
+
             string w_name = layer_def.input(1);
             string b_name = layer_def.input(2);
 
@@ -106,7 +109,7 @@ void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::Ten
 
             net_tensors[w_name] = Wb.first;
             net_tensors[b_name] = Wb.second;
-            net_outputs[output_name] = std::make_shared<FCLayer>(net_tensors[w_name], net_tensors[b_name], net_outputs[input_name]);
+            net_outputs[output_name] = std::make_shared<FCLayer>(net_tensors[w_name], net_tensors[b_name], net_outputs[flatten_name]);
             std::cout << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cout << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
@@ -194,7 +197,7 @@ void Net::LoadWeights(const string& network_weights, bool binary) {
 }
 
 void Net::ReadImage(const std::string& image_path) {
-    ImageInfo params{256,256,3,1};
+    ImageInfo params{190, 190, 3, 1};// ~~190 {64,128,3,1};
     Halide::Buffer<float> image = load_and_convert_image(image_path);
     
     net_outputs["data"] = std::make_shared<DataLayer>(image, params);

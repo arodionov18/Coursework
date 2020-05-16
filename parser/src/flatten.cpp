@@ -5,6 +5,7 @@ using namespace Halide;
 FlattenLayer::FlattenLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
     auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() >= 2 && layer->out_dims() <= 4);
+    num_samples = layer->out_dim_size(0);
 
     if (layer->out_dims() == 2) {
         out_width = layer->out_dim_size(1);

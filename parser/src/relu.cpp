@@ -11,10 +11,13 @@ ReluLayer::ReluLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer(input
         break;
     case 2:
         forward(y, x) = max(0, layer->forward(y, x));
+        break;
     case 3:
         forward(z, y, x) = max(0, layer->forward(z, y, x));
+        break;
     case 4:
         forward(n, z, y, x) = max(0, layer->forward(n, z, y, x));
+        break;
     default:
         // LOG_ASSERT(false) << "Bad input dimensions";
         break;

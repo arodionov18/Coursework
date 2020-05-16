@@ -1,7 +1,7 @@
 #include "data.h"
 
 using namespace Halide;
-
+// img in CHW format
 DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(std::shared_ptr<AbstractLayer>()) {
     in_h = info.h;
     in_w = info.w;
