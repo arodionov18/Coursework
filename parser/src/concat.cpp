@@ -9,15 +9,15 @@ ConcatLayer::ConcatLayer(const std::vector<std::shared_ptr<AbstractLayer>>& inpu
     int offset = 0;
     // forward(x, y, z, n) = 0.0f; why?
     auto input = inputs[0];
-    in_w = input->out_dim_size(0);
-    in_h = input->out_dim_size(1);
-    in_ch = 0;
-    num_samples = input->out_dim_size(3);
+    in_w = input->out_dim_size(3);
+    in_h = input->out_dim_size(2);
+    in_ch = input->out_dim_size(1);
+    num_samples = input->out_dim_size(0);
 
     for (const auto& layer_w : inputs) {
         auto layer = layer_w;
-        RDom r(0, layer->out_dim_size(2));
-        forward(x, y, offset + r, n) = layer->forward(x, y, r, n);
+        RDom r(0, layer->out_dim_size(1));
+        forward(n, offset + r, y, x) = layer->forward(n, r, y, x);
         offset += layer->out_dim_size(2);
     }
 }

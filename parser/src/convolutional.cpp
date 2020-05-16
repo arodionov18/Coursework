@@ -17,12 +17,16 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
     in_h = input_layer_->out_dim_size(2);
     in_w = input_layer_->out_dim_size(3);
     std::cout << "Convolutional layer" << std::endl;
+    std::cout << "Params dims: " << w.dims_size() << std::endl;
+    for (int i = 0; i < w.dims_size(); ++i) {
+        std::cout << "dim " << i << ", " << w.dims(i) << std::endl;
+    }
+    f_w = w.dims(3);
+    f_h = w.dims(2);
+    num_f = w.dims(0);
     params.push_back(LoadBufferFromTensor(w));
     params.push_back(LoadBufferFromTensor(b));
-
-    num_f = params[0].extent(3);
-    f_w = params[0].width();
-    f_h = params[0].height();
+    assert(num_f == b.dims(0));
 
     pad = op.arg(1).i(); // уточнить
     stride = op.arg(0).i();
@@ -32,12 +36,12 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
         0, in_w,
         0, in_h);
 
-    Halide::RDom r(0, f_w, 0, f_h, 0, in_ch);
+    Halide::RDom r(0, f_w, 0, f_h, 0, in_ch, 0, num_f);
 
-    forward(x, y, z, n) = params[1](z);
-    forward(x, y, z, n) += params[0](r.x, r.y, r.z, z) * forward_clamp(x * stride + r.x - pad,
-                                                 y * stride + r.y - pad,
-                                                 r.z, n);
+    forward(n, z, y, x) = params[1](z);
+    forward(n, z, y, x) += params[0](r.x, r.y, r.z, z) * forward_clamp(n, r.z,
+                                                                       y * stride + r.y - pad,
+                                                                       x * stride + r.x - pad);
     
     if (schedule) {
         o_block_size = 16;

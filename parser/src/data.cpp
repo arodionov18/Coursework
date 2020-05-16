@@ -10,8 +10,8 @@ DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(st
 
     //Func data = BoundaryConditions::constant_exterior(img, 0.f, 0, in_w, in_h);
     img.add_dimension();
-    Func data = BoundaryConditions::constant_exterior(img, 0.f, 0, in_w, 0, in_h, 0, in_ch, 0, 1);
-    forward(x, y, z, n) = data(x, y, z, n);
+    Func data = BoundaryConditions::constant_exterior(img, 0.f, 0, num_samples, 0, in_ch, 0, in_h, 0, in_w);
+    forward(n, z, y, x) = data(n, z, y, x);
 }
 
 void DataLayer::back_propagate(Func dout) {

@@ -19,9 +19,9 @@ MaxPoolingLayer::MaxPoolingLayer(const caffe2::OperatorDef& op, std::shared_ptr<
     // LOG_ASSERT((in_w - p_w) % stride == 0) << "Bad Wpad";
 
     RDom r(0, p_w, 0, p_h);
-    forward(x, y, z, n) = maximum(layer->forward(x * stride + r.x,
-                                                 y * stride + r.y,
-                                                 z, n));
+    forward(n, z, y, x) = maximum(layer->forward(n, z,
+                                                 x * stride + r.x,
+                                                 y * stride + r.y));
     
     if (schedule) {
         forward.vectorize(x, vec_len);

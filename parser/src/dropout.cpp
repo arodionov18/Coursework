@@ -31,20 +31,20 @@ DropoutLayer::DropoutLayer(const caffe2::OperatorDef& op, std::shared_ptr<Abstra
         break;
 
     case 3:
-        mask(x, y, z) = select(random_float() > ratio, scale, 0.0f);
+        mask(z, y, x) = select(random_float() > ratio, scale, 0.0f);
         if (is_test) {
-            forward(x, y, z) = layer->forward(x, y, z);
+            forward(z, y, x) = layer->forward(z, y, x);
         } else {
-            forward(x, y, z) = mask(x, y, z) * layer->forward(x, y, z);
+            forward(z, y, x) = mask(z, y, x) * layer->forward(z, y, x);
         }
         break;
     
     case 4:
-        mask(x, y, z, n) = select(random_float() > ratio, scale, 0.0f);
+        mask(n, z, y, x) = select(random_float() > ratio, scale, 0.0f);
         if (is_test) {
-            forward(x, y, z, n) = layer->forward(x, y, z, n);
+            forward(n, z, y, x) = layer->forward(n, z, y, x);
         } else {
-            forward(x, y, z, n) = mask(x, y, z, n) * layer->forward(x, y, z, n);
+            forward(n, z, y, x) = mask(n, z, y, x) * layer->forward(n, z, y, x);
         }
         break;
 
@@ -72,11 +72,11 @@ void DropoutLayer::back_propagate(Func dout) {
             break;
 
         case 3:
-            f_in_grad(x, y, z) = dout(x, y, z) * mask(x, y, z);
+            f_in_grad(z, y, x) = dout(z, y, x) * mask(z, y, x);
             break;
         
         case 4:
-            f_in_grad(x, y, z, n) = dout(x, y, z, n) * mask(x, y, z, n);
+            f_in_grad(n, z, y, x) = dout(n, z, y, x) * mask(n, z, y, x);
             break;
         
         default:

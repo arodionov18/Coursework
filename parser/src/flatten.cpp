@@ -7,20 +7,20 @@ FlattenLayer::FlattenLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer
     // LOG_ASSERT(layer->out_dims() >= 2 && layer->out_dims() <= 4);
 
     if (layer->out_dims() == 2) {
-        out_width = layer->out_dim_size(0);
-        forward(x, n) = layer->forward(x, n);
+        out_width = layer->out_dim_size(1);
+        forward(n, x) = layer->forward(n, x);
     } else if (layer->out_dims() == 3) {
         int w = layer->out_dim_size(2);
         int h = layer->out_dim_size(1);
         out_width = w * h;
-        forward(x, n) = layer->forward(x % w, x / w, n);
+        forward(n, x) = layer->forward(n, x / w, x % w);
     } else if (layer->out_dims() == 4) {
         int w = layer->out_dim_size(3);
         int h = layer->out_dim_size(2);
         int c = layer->out_dim_size(1);
         out_width = w * h * c;
 
-        forward(x, n) = layer->forward(x % w, (x / w) % h, x / (w * h), n);
+        forward(n, x) = layer->forward(n, x / (w * h), (x / w) % h, x % w);
     }
 
     forward.compute_root().parallel(n); // check with schedule
@@ -32,14 +32,14 @@ void FlattenLayer::back_propagate(Func dout) {
     if (!f_in_grad.defined()) {
         auto layer = input_layer;
         if (layer->out_dims() == 2) {
-            f_in_grad(x, n) = dout(x, n);
+            f_in_grad(n, x) = dout(n, x);
         } else if (layer->out_dims() == 3) {
             int w = layer->out_dim_size(2);
-            f_in_grad(x, y, n) = dout(y * w + x, n);
+            f_in_grad(n, y, x) = dout(n, y * w + x);
         } else if (layer->out_dims() == 4) {
             int w = layer->out_dim_size(3);
             int h = layer->out_dim_size(2);
-            f_in_grad(x, y, z, n) = dout(z * w * h + y * w + x, n);
+            f_in_grad(n, z, y, x) = dout(n, z * w * h + y * w + x);
         }
         layer->back_propagate(f_in_grad);
     }
@@ -52,7 +52,7 @@ int FlattenLayer::out_dims() const {
 int FlattenLayer::out_dim_size(int i) const {
     // LOG_ASSERT(i < 2) << "Wrong index";
     int size = 0;
-    if (i == 0) {
+    if (i == 1) {
         size = out_width;
     } else {
         size = num_samples;

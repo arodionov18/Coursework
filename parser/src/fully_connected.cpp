@@ -5,7 +5,7 @@
 FCLayer::FCLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b, std::shared_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
     auto input_layer_ = input_layer;
     
-    Halide::RDom r(0, input_layer_->out_dim_size(0));
+    Halide::RDom r(0, input_layer_->out_dim_size(3));
 
     std::cout << "FC: W: " << w.dims_size() << std::endl;
     for (int i = 0; i < w.dims_size(); ++i) {
@@ -20,8 +20,8 @@ FCLayer::FCLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b, std
     params.push_back(LoadBufferFromTensor(w));
     params.push_back(LoadBufferFromTensor(b));
 
-    forward(x, y, z, n) = sum(params[0](x, r.x) * input_layer_->forward(r.x, y, z, n));
-    forward(x, y, z, n) += params[1](x);
+    forward(n, z, y, x) = sum(params[0](x, r.x) * input_layer_->forward(n, z, y, r.x));
+    forward(n, z, y, x) += params[1](z);
 }
 
 void FCLayer::back_propagate(Halide::Func dout) {

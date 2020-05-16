@@ -3,7 +3,7 @@
 
 Halide::Buffer<float> LoadBufferFromTensor(const caffe2::TensorProto& tensor) {
     int width = 0, height = 0, channel = 0, number = 0;
-    std::cout << tensor.name() << ": " << tensor.dims_size();
+    // std::cout << tensor.name() << ": " << tensor.dims_size();
     if (tensor.dims_size() == 4) {
         // why this order?
         channel = tensor.dims(1);
