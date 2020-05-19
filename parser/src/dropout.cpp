@@ -4,6 +4,7 @@ using namespace Halide;
 
 DropoutLayer::DropoutLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
     auto layer = input_layer;
+    //forward.trace_stores();
 
     ratio = op.arg(0).f(); // ratio
     is_test = op.arg(1).i(); // phase

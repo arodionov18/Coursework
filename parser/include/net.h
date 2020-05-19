@@ -32,6 +32,8 @@ public:
 
     //const vector<Blob<Dtype>*>& Forward(DType* loss = NULL);
 
+    std::pair<float, int> GetResults();
+
     void Backward();
 
     void Reshape();

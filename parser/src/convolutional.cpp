@@ -32,14 +32,16 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
     stride = op.arg(0).i();
 
     forward_clamp = Halide::BoundaryConditions::constant_exterior(
-        input_layer_->forward, 0.f,
-        0, in_w,
-        0, in_h);
+        input_layer_->forward, 0.0f,
+        0, num_samples,
+        0, in_ch,
+        0, in_h,
+        0, in_w);
 
-    Halide::RDom r(0, f_w, 0, f_h, 0, in_ch, 0, num_f);
+    Halide::RDom r(0, f_w, 0, f_h, 0, in_ch);
 
     forward(n, z, y, x) = params[1](z);
-    forward(n, z, y, x) += params[0](r.x, r.y, r.z, z) * forward_clamp(n, r.z,
+    forward(n, z, y, x) += params[0](z, r.z, r.y, r.x) * forward_clamp(n, r.z,
                                                                        y * stride + r.y - pad,
                                                                        x * stride + r.x - pad);
     

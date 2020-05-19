@@ -5,6 +5,7 @@ using namespace Halide;
 FlattenLayer::FlattenLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
     auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() >= 2 && layer->out_dims() <= 4);
+    // forward.trace_stores();
     num_samples = layer->out_dim_size(0);
 
     if (layer->out_dims() == 2) {
@@ -12,8 +13,8 @@ FlattenLayer::FlattenLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer
         forward(n, x) = layer->forward(n, x);
     } else if (layer->out_dims() == 3) {
         int w = layer->out_dim_size(2);
-        int h = layer->out_dim_size(1);
-        out_width = w * h;
+        int c = layer->out_dim_size(1);
+        out_width = w * c;
         forward(n, x) = layer->forward(n, x / w, x % w);
     } else if (layer->out_dims() == 4) {
         int w = layer->out_dim_size(3);
@@ -58,5 +59,5 @@ int FlattenLayer::out_dim_size(int i) const {
     } else {
         size = num_samples;
     }
-    return size; // NRVO;
+    return size;
 }

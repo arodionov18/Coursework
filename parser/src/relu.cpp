@@ -4,19 +4,20 @@ using namespace Halide;
 
 ReluLayer::ReluLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer(input) {
     auto layer = input_layer;
+    //forward.trace_stores();
     switch (layer->out_dims())
     {
     case 1:
-        forward(x) = max(0, layer->forward(x));
+        forward(x) = max(0.0f, layer->forward(x));
         break;
     case 2:
-        forward(y, x) = max(0, layer->forward(y, x));
+        forward(y, x) = max(0.0f, layer->forward(y, x));
         break;
     case 3:
-        forward(z, y, x) = max(0, layer->forward(z, y, x));
+        forward(z, y, x) = max(0.0f, layer->forward(z, y, x));
         break;
     case 4:
-        forward(n, z, y, x) = max(0, layer->forward(n, z, y, x));
+        forward(n, z, y, x) = max(0.0f, layer->forward(n, z, y, x));
         break;
     default:
         // LOG_ASSERT(false) << "Bad input dimensions";

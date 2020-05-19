@@ -5,23 +5,29 @@ using namespace Halide;
 MaxPoolingLayer::MaxPoolingLayer(const caffe2::OperatorDef& op, std::shared_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
     auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() == 4);
+    //forward.trace_stores();
 
     num_samples = layer->out_dim_size(0);
     in_ch = layer->out_dim_size(1);
     in_h = layer->out_dim_size(2);
     in_w = layer->out_dim_size(3);
 
-    p_h = op.arg(1).i();
-    p_w = op.arg(1).i(); // CHECK THIS NORMAL
+    p_h = op.arg(2).i();
+    p_w = op.arg(2).i(); // CHECK THIS NORMAL
     stride = op.arg(0).i();
 
-    // LOG_ASSERT((in_h - p_h) % stride == 0) << "Bad Hpad";
-    // LOG_ASSERT((in_w - p_w) % stride == 0) << "Bad Wpad";
+    assert((in_h - p_h) % stride == 0);// << "Bad Hpad";
+    assert((in_w - p_w) % stride == 0);// << "Bad Wpad";
+    Func forward_clamp = BoundaryConditions::constant_exterior(layer->forward, 0.f,
+                                                               0, num_samples,
+                                                               0, in_ch,
+                                                               0, in_h,
+                                                               0, in_w);
 
     RDom r(0, p_w, 0, p_h);
-    forward(n, z, y, x) = maximum(layer->forward(n, z,
-                                                 x * stride + r.x,
-                                                 y * stride + r.y));
+    forward(n, z, y, x) = maximum(forward_clamp(n, z,
+                                                 y * stride + r.y,
+                                                 x * stride + r.x));
     
     if (schedule) {
         forward.vectorize(x, vec_len);

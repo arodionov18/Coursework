@@ -3,6 +3,7 @@
 using namespace Halide;
 
 SoftmaxLayer::SoftmaxLayer(std::shared_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
+    //forward.trace_stores();
     auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() == 2);
     std::cout << "Softmax: " << layer->out_dims() << std::endl;
@@ -15,11 +16,11 @@ SoftmaxLayer::SoftmaxLayer(std::shared_ptr<AbstractLayer> input, int schedule) :
 
     Func exp_max, expo, normalizer;
     RDom r(0, num_classes);
-    exp_max(n) = maximum(layer->forward(r.x, n));
-    expo(in_dim, n) = exp(layer->forward(in_dim, n) - exp_max(n));
-    normalizer(n) = cast(layer->forward.output_types()[0], 0);
-    normalizer(n) += expo(r.x, n);
-    forward(in_dim, n) = expo(in_dim, n) / normalizer(n);
+    exp_max(n) = maximum(layer->forward(n, r.x));
+    expo(n, in_dim) = exp(layer->forward(n, in_dim) - exp_max(n));
+    normalizer(n) = cast<float>(0);
+    normalizer(n) += expo(n, r.x);
+    forward(n, in_dim) = expo(n, in_dim) / normalizer(n);
 
     if (schedule) {
         exp_max.compute_at(forward, n);
@@ -61,9 +62,9 @@ int SoftmaxLayer::out_dims() const {
 int SoftmaxLayer::out_dim_size(int i) const {
     // LOG_ASSERT(i < 2) << "wrong input";
     int size = 0;
-    if (i == 0) {
+    if (i == 1) {
         size = num_classes;
-    } else if (i == 1) {
+    } else if (i == 0) {
         size = num_samples;
     }
     return size;

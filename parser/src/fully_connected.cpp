@@ -5,9 +5,13 @@
 FCLayer::FCLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b, std::shared_ptr<AbstractLayer> input, int schedule) : AbstractLayer(input) {
     assert(input_layer->out_dims() == 2);
     //Halide::RDom r(0, input_layer->out_dim_size(1));
+    // forward.trace_stores();
 
     num_samples = input_layer->out_dim_size(0);
+    std::cout << input_layer->out_dim_size(1) << std::endl;
+    assert(input_layer->out_dim_size(1) == w.dims(1));
     out_width = w.dims(0); // (M, K) * (N, K)^T = (M, N)
+    //                        (1, K) * (4096, K)^T = (1, 4096)
 
     std::cout << "FC: W: " << w.dims_size() << std::endl;
     for (int i = 0; i < w.dims_size(); ++i) {
@@ -22,9 +26,9 @@ FCLayer::FCLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b, std
     params.push_back(LoadBufferFromTensor(w));
     params.push_back(LoadBufferFromTensor(b));
 
-    RDom r(0, num_samples);
-    forward(x, y) = params[1](x);
-    forward(x, y) += params[0](r.x, x) * input_layer->forward(r.x, y);
+    RDom r(0, input_layer->out_dim_size(1));
+    forward(x, y) = params[1](y);
+    forward(x, y) += input_layer->forward(x, r.x) * params[0](y, r.x);
 
     if (schedule) {
         forward.compute_root().fuse(x, y, par).parallel(par);

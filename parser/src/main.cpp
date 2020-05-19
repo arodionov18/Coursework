@@ -9,6 +9,7 @@
 
 int main(int argc, char** argv) {
     google::InitGoogleLogging(argv[0]);
+    LOG(INFO) << "LOG" << std::endl;
     std::cout << "Hello World!" << std::endl;
     std::string network_name = argv[1];
     std::string weights_name = argv[2];
@@ -18,6 +19,7 @@ int main(int argc, char** argv) {
     network.ReadImage(image_path);
     network.LoadWeights(weights_name, true);
     network.Init();
-
+    auto results = network.GetResults();
+    std::cout << "MaxProb: " << results.first << ", class: " << results.second;
     google::protobuf::ShutdownProtobufLibrary();
 }

@@ -178,8 +178,9 @@ void Net::LoadWeights(const string& network_weights, bool binary) {
     }
     std::fstream input_weights(network_weights, flags);
     caffe2::NetDef def;
-    def.ParsePartialFromIstream(&input_weights);
-    weights.InitAsDefaultInstance();
+    def.ParseFromIstream(&input_weights);
+    float max_weight = 0;
+    //weights.InitAsDefaultInstance();
     for (int op_idx = 0; op_idx < def.op_size(); ++op_idx) {
         auto operation_def = def.op(op_idx);
         caffe2::TensorProto* tensor = weights.add_protos();
@@ -191,14 +192,27 @@ void Net::LoadWeights(const string& network_weights, bool binary) {
         }
         tensor->clear_float_data();
         for (int i = 0; i < operation_def.arg(1).floats_size(); ++i) {
+            max_weight = std::max(max_weight, abs(operation_def.arg(1).floats(i)));
             tensor->add_float_data(operation_def.arg(1).floats(i));
         }
     }
+    std::cout << "Maximum weight is: " << max_weight << std::endl;
 }
 
 void Net::ReadImage(const std::string& image_path) {
-    ImageInfo params{190, 190, 3, 1};// ~~190 {64,128,3,1};
+    ImageInfo params;//{190, 190, 3, 1};// ~~190 {64,128,3,1};
     Halide::Buffer<float> image = load_and_convert_image(image_path);
+    /*std::cout << "INPUT IMG\n";
+    for (size_t i = 0; i < image.extent(0); ++i) {
+        for (size_t j = 0; j < image.extent(1); ++j) {
+            std::cout << "[" << image(i,j,0) << "," << image(i,j,1) << "," << image(i,j,2) << "]\t";
+        }
+        std::cout << std::endl;
+    }*/
+    params.num_samples = 1;
+    params.w = image.extent(0);
+    params.h = image.extent(1);
+    params.channels = image.extent(2);
     
     net_outputs["data"] = std::make_shared<DataLayer>(image, params);
 }
@@ -210,6 +224,27 @@ void Net::Init() {
     }
     //std::cout << net_outputs["prob"]->out_dims();
     std::cout << "GOOD" << std::endl;
+}
+
+std::pair<float, int> Net::GetResults() {
+    Halide::Buffer<float> results = net_outputs["prob"]->forward.realize(1, 1000);
+
+    Halide::Buffer<float> tmp_results = net_outputs["prob"]->input_layer->forward.realize(1, 1000);
+    for (size_t i = 0; i < 1000; ++i) {
+        std::cout << tmp_results(0,i) << ", ";
+    }
+    std::cout << std::endl;
+    float max_prob = 0;
+    int max_prob_class = -1;
+    std::cout << "Probs: " << std::endl;
+    for (size_t i = 0; i < 1000; ++i) {
+        std::cout << results(0, i) << std::endl;
+        if (results(0, i) > max_prob) {
+            max_prob_class = i + 1;
+            max_prob = results(0, i);
+        }
+    }
+    return {max_prob, max_prob_class};
 }
 
 } // net

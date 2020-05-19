@@ -24,4 +24,14 @@ public:
 
     int out_dim_size(int i) const;
 
+private:
+    const int kImageSize = 224; // Optimal size for pretrained vgg19
+
+    Halide::Buffer<float> rescale(const Halide::Buffer<float>& image, const ImageInfo& info);
+
+    Halide::Buffer<float> crop_center(const Halide::Buffer<float>& image, const ImageInfo& info);
+
+    Halide::Buffer<float> convert_to_nchw(const Halide::Buffer<float>& image, const ImageInfo& info);
+
+    Halide::Buffer<float> convert_to_bgr(const Halide::Buffer<float>& image, const ImageInfo& info);
 };

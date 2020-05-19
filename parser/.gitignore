@@ -3,6 +3,8 @@
 /inception_v1
 /build
 /dbuild
+/out.txt
 /.vscode
 *.pb
 *.jpg
+*.jpeg

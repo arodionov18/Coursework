@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
+# Set your own path to halide
 set(HALIDE_PATH "/home/anton/Downloads/halide")
 
 include_directories(${HALIDE_PATH}/include)
