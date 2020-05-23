@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 
 #include <glog/logging.h>
 #include <google/protobuf/text_format.h>
@@ -20,6 +21,6 @@ int main(int argc, char** argv) {
     network.LoadWeights(weights_name, true);
     network.Init();
     auto results = network.GetResults();
-    std::cout << "MaxProb: " << results.first << ", class: " << results.second;
+    std::cout << "MaxProb: " << std::fixed << std::setprecision(4) << results.first << ", class: " << results.second;
     google::protobuf::ShutdownProtobufLibrary();
 }

@@ -18,14 +18,9 @@ MaxPoolingLayer::MaxPoolingLayer(const caffe2::OperatorDef& op, std::shared_ptr<
 
     assert((in_h - p_h) % stride == 0);// << "Bad Hpad";
     assert((in_w - p_w) % stride == 0);// << "Bad Wpad";
-    Func forward_clamp = BoundaryConditions::constant_exterior(layer->forward, 0.f,
-                                                               0, num_samples,
-                                                               0, in_ch,
-                                                               0, in_h,
-                                                               0, in_w);
 
     RDom r(0, p_w, 0, p_h);
-    forward(n, z, y, x) = maximum(forward_clamp(n, z,
+    forward(n, z, y, x) = maximum(layer->forward(n, z,
                                                  y * stride + r.y,
                                                  x * stride + r.x));
     

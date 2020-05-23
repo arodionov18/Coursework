@@ -24,12 +24,35 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
     f_w = w.dims(3);
     f_h = w.dims(2);
     num_f = w.dims(0);
-    params.push_back(LoadBufferFromTensor(w));
-    params.push_back(LoadBufferFromTensor(b));
+    params.push_back(LoadBufferFromTensor(w)); // W(N, C, Kh, Kw)
+    params.push_back(LoadBufferFromTensor(b)); // b(N)
     assert(num_f == b.dims(0));
 
-    pad = op.arg(1).i(); // уточнить
-    stride = op.arg(0).i();
+    /*Halide::Buffer<float> debug_output = input_layer->forward.realize({1, in_ch, in_h, in_w});
+    std::cout << "CONV LAYER" << std::endl;
+    for (size_t i = 0; i < in_ch; ++i)
+    {
+        std::cout << std::endl
+                  << "C: " << i << std::endl;
+        for (size_t j = 0; j < in_h; ++j)
+        {
+            for (size_t k = 0; k < in_w; ++k)
+            {
+                std::cout << debug_output(0, i, j, k) << " ";
+            }
+            std::cout << std::endl;
+        }
+    }*/
+
+    pad = 1;
+    stride = 1;
+    for (size_t i = 0; i < op.arg_size(); ++i) {
+        if (op.arg(i).name() == "pad") {
+            pad = op.arg(i).i();
+        } else if (op.arg(i).name() == "stride") {
+            stride = op.arg(i).i();
+        }
+    }
 
     forward_clamp = Halide::BoundaryConditions::constant_exterior(
         input_layer_->forward, 0.0f,
@@ -40,7 +63,7 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
 
     Halide::RDom r(0, f_w, 0, f_h, 0, in_ch);
 
-    forward(n, z, y, x) = params[1](z);
+    forward(n, z, y, x) = cast<float>(params[1](z));
     forward(n, z, y, x) += params[0](z, r.z, r.y, r.x) * forward_clamp(n, r.z,
                                                                        y * stride + r.y - pad,
                                                                        x * stride + r.x - pad);

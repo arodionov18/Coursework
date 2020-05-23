@@ -201,7 +201,7 @@ void Net::LoadWeights(const string& network_weights, bool binary) {
 
 void Net::ReadImage(const std::string& image_path) {
     ImageInfo params;//{190, 190, 3, 1};// ~~190 {64,128,3,1};
-    Halide::Buffer<float> image = load_and_convert_image(image_path);
+    Halide::Buffer<uint8_t> image = load_image(image_path);
     /*std::cout << "INPUT IMG\n";
     for (size_t i = 0; i < image.extent(0); ++i) {
         for (size_t j = 0; j < image.extent(1); ++j) {
@@ -213,8 +213,19 @@ void Net::ReadImage(const std::string& image_path) {
     params.w = image.extent(0);
     params.h = image.extent(1);
     params.channels = image.extent(2);
+    Halide::Buffer<float> fimage(params.w, params.h, params.channels);
+    std::cout << "inp_image" << std::endl;
+    for (size_t i = 0; i < params.w; ++i) {
+        for (size_t j = 0; j < params.h; ++j) {
+            for (size_t c = 0; c < params.channels; ++c) {
+                fimage(i, j, c) = 1.0f * image(i, j, c);
+                std::cout << "[" << fimage(i, j, c) << ", " << image(i, j, c) << "]" <<  " ";
+            }
+        }
+    }
+    std::cout << std::endl;
     
-    net_outputs["data"] = std::make_shared<DataLayer>(image, params);
+    net_outputs["data"] = std::make_shared<DataLayer>(fimage, params);
 }
 
 void Net::Init() {
@@ -236,6 +247,8 @@ std::pair<float, int> Net::GetResults() {
     std::cout << std::endl;
     float max_prob = 0;
     int max_prob_class = -1;
+    float min_prob = 1;
+    int min_prob_class = -1;
     std::cout << "Probs: " << std::endl;
     for (size_t i = 0; i < 1000; ++i) {
         std::cout << results(0, i) << std::endl;
@@ -243,7 +256,12 @@ std::pair<float, int> Net::GetResults() {
             max_prob_class = i + 1;
             max_prob = results(0, i);
         }
+        if (results(0, i) < min_prob) {
+            min_prob_class = i + 1;
+            min_prob = results(0, i);
+        }
     }
+    std::cout << "Min prob: " << min_prob << ", class: " << min_prob_class << std::endl;
     return {max_prob, max_prob_class};
 }
 

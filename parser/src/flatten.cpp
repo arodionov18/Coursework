@@ -21,6 +21,16 @@ FlattenLayer::FlattenLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer
         int h = layer->out_dim_size(2);
         int c = layer->out_dim_size(1);
         out_width = w * h * c;
+        /*Halide::Buffer<float> debug_output = layer->forward.realize({1, c, h, w});
+        for (size_t i = 0; i < c; ++i) {
+            std::cout << std::endl << "C: " << c << std::endl;
+            for (size_t j = 0; j < h; ++j) {
+                for (size_t k = 0; k < w; ++k) {
+                    std::cout << debug_output(0, i, j, k) << " ";
+                }
+                std::cout << std::endl;
+            } 
+        }*/
 
         forward(n, x) = layer->forward(n, x / (w * h), (x / w) % h, x % w);
     }
