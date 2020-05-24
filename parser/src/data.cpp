@@ -5,7 +5,7 @@ using namespace Halide;
 
 template <class T>
 void PrintDebugImage(const Buffer<T>& img, int i) {
-    std::cout << "INPUT_IMG_DEBUG: " << i << std::endl;
+    std::cerr << "INPUT_IMG_DEBUG: " << i << std::endl;
     if (img.dimensions() == 4) {
         for (size_t i = 0; i < img.extent(0); ++i)
         {
@@ -15,11 +15,11 @@ void PrintDebugImage(const Buffer<T>& img, int i) {
                 {
                     for (size_t m = 0; m < img.extent(3); ++m)
                     {
-                        std::cout << img(i, j, k, m) << " ";
+                        std::cerr << img(i, j, k, m) << " ";
                     }
-                    std::cout << std::endl;
+                    std::cerr << std::endl;
                 }
-                std::cout << "##" << std::endl;
+                std::cerr << "##" << std::endl;
             }
         }
     } else if (img.dimensions() == 3) {
@@ -29,21 +29,17 @@ void PrintDebugImage(const Buffer<T>& img, int i) {
             {
                 for (size_t k = 0; k < img.extent(2); ++k)
                 {
-                    std::cout << img(k, j, i) << " ";
+                    std::cerr << img(k, j, i) << " ";
                 }
-                std::cout << std::endl;
+                std::cerr << std::endl;
             }
-            std::cout << "##" << std::endl;
+            std::cerr << "##" << std::endl;
         }
     }
-    std::cout << std::endl << std::endl;
+    std::cerr << std::endl << std::endl;
 }
-// img in CHW format
-DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(std::shared_ptr<AbstractLayer>()) {
 
-    //Func data = BoundaryConditions::constant_exterior(img, 0.f, 0, in_w, in_h);
-    //forward.trace_stores();
-    PrintDebugImage(img, 10);
+void DataLayer::LoadNewImage(Buffer<float> img, const ImageInfo& info) {
     img.add_dimension();
     Buffer<float> rescaled_image = rescale(convert_to_nchw(img, info), info);
     ImageInfo rescaled_info;
@@ -54,11 +50,11 @@ DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(st
 
     // PrintDebugImage(rescaled_image, 11);
 
-    std::cout << "rescaled image info: " << rescaled_info.num_samples << " " << rescaled_info.channels << " " << rescaled_info.h << " " << rescaled_info.w << std::endl;
+    std::cerr << "rescaled image info: " << rescaled_info.num_samples << " " << rescaled_info.channels << " " << rescaled_info.h << " " << rescaled_info.w << std::endl;
 
     Buffer<float> cropped_image = crop_center(convert_to_bgr(rescaled_image, rescaled_info), rescaled_info);
 
-    // PrintDebugImage(cropped_image, 12);
+    PrintDebugImage(cropped_image, 12);
 
     in_h = kImageSize;
     in_w = kImageSize;
@@ -67,6 +63,15 @@ DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(st
 
     Func data = BoundaryConditions::constant_exterior(cropped_image, 0.0f, 0, num_samples, 0, in_ch, 0, in_h, 0, in_w);
     forward(n, z, y, x) = data(n, z, y, x) - 128.0f;
+}
+
+// img in CHW format
+DataLayer::DataLayer(Buffer<float> img, const ImageInfo& info): AbstractLayer(std::shared_ptr<AbstractLayer>()) {
+
+    //Func data = BoundaryConditions::constant_exterior(img, 0.f, 0, in_w, in_h);
+    //forward.trace_stores();
+    //PrintDebugImage(img, 10);
+    LoadNewImage(img, info);
 }
 
 void DataLayer::back_propagate(Func dout) {

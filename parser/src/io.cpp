@@ -19,12 +19,12 @@ using google::protobuf::io::CodedOutputStream;
 using std::ios;
 using std::fstream;
 using std::endl;
-using std::cout;
+using std::cerr;
 
 bool ReadProtoFromTextFile(const string& filename, Message* proto) {
     fstream in(filename, ios::in);
     if (!in.is_open()) {
-        cout << "Failed to open " << filename << " for reading" << endl;
+        cerr << "Failed to open " << filename << " for reading" << endl;
     }
 
     IstreamInputStream inputStream(&in);
@@ -36,7 +36,7 @@ bool ReadProtoFromTextFile(const string& filename, Message* proto) {
 bool WriteProtoToTextFile(const string& filename, const Message& proto) {
     fstream out(filename, ios::out | ios::trunc);
     if (!out.is_open()) {
-        cout << "Failed to open " << filename << " for writing" << endl;
+        cerr << "Failed to open " << filename << " for writing" << endl;
     }
 
     OstreamOutputStream outputStream(&out);
@@ -48,7 +48,7 @@ bool WriteProtoToTextFile(const string& filename, const Message& proto) {
 bool ReadProtoFromBinaryFile(const string& filename, Message* proto) {
     fstream in(filename, ios::in | ios::binary);
     if (!in.is_open()) {
-        cout << "Failed to open " << filename << " for reading" << endl;
+        cerr << "Failed to open " << filename << " for reading" << endl;
     }
 
     IstreamInputStream inputStream(&in);
@@ -61,7 +61,7 @@ bool ReadProtoFromBinaryFile(const string& filename, Message* proto) {
 bool WriteProtoToBinaryFile(const string& filename, const Message& proto) {
     fstream out(filename, ios::out | ios::trunc | ios::binary);
     if (!out.is_open()) {
-        cout << "Failed to open " << filename << " for writing" << endl;
+        cerr << "Failed to open " << filename << " for writing" << endl;
     }
 
     bool result = proto.SerializeToOstream(&out);

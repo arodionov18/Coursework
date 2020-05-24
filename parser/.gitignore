@@ -4,6 +4,7 @@
 /build
 /dbuild
 /out.txt
+/release_build
 /.vscode
 *.pb
 *.jpg

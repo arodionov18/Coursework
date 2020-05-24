@@ -18,6 +18,8 @@ public:
 
     DataLayer(Buffer<float> img, const ImageInfo& info);
 
+    void LoadNewImage(Buffer<float> img, const ImageInfo& info);
+
     void back_propagate(Func dout) override;
 
     int out_dims() const;
