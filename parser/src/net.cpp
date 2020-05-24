@@ -36,8 +36,8 @@ std::pair<caffe2::TensorProto, caffe2::TensorProto> GetTensors(const caffe2::Ten
 
 void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::TensorProtos& tensor) {
     LOG(INFO) << "Create network";
-    std::cerr << "Create network" << std::endl;
-    std::cerr << network.op_size() << std::endl;
+    // std::cerr << "Create network" << std::endl;
+    // std::cerr << network.op_size() << std::endl;
     //network.PrintDebugString();
     for (int i = 0; i < network.op_size(); ++i) {
         auto layer_def = network.op(i);
@@ -52,37 +52,37 @@ void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::Ten
 
             string w_name = layer_def.input(1);
             string b_name = layer_def.input(2);
-            std::cerr << w_name << " " << b_name << std::endl;
+            //std::cerr << w_name << " " << b_name << std::endl;
 
             auto Wb = GetTensors(tensor, w_name, b_name);
-            std::cerr << "WW" << Wb.first.dims_size() << std::endl;
+            // std::cerr << "WW" << Wb.first.dims_size() << std::endl;
             net_tensors[w_name] = Wb.first;
             net_tensors[b_name] = Wb.second;
             net_outputs[output_name] = std::make_shared<ConvolutionalLayer>(net_tensors[w_name], net_tensors[b_name], layer_def, net_outputs[input_name]);
-            std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
+            /*std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cerr << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
             }
-            std::cerr << "##EE##" << std::endl;
+            std::cerr << "##EE##" << std::endl;*/
         } else if (layer_def.type() == "Relu") {
             string input_name = layer_def.input(0);
             string output_name = layer_def.output(0);
             net_outputs[output_name] = std::make_shared<ReluLayer>(net_outputs[input_name]);
-            std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
+            /*std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cerr << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
             }
-            std::cerr << "##EE##" << std::endl;
+            std::cerr << "##EE##" << std::endl;*/
             
         } else if (layer_def.type() == "MaxPool") {
             string input_name = layer_def.input(0);
             string output_name = layer_def.output(0);
             net_outputs[output_name] = std::make_shared<MaxPoolingLayer>(layer_def, net_outputs[input_name]);
-            std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
+            /*std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cerr << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
             }
-            std::cerr << "##EE##" << std::endl;
+            std::cerr << "##EE##" << std::endl;*/
         } else if (layer_def.type() == "AveragePool") {
 
         } else if (layer_def.type() == "Dropout") {
@@ -90,11 +90,11 @@ void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::Ten
             string output_name = layer_def.output(0);
 
             net_outputs[output_name] = std::make_shared<DropoutLayer>(layer_def, net_outputs[input_name]);
-            std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
+            /*std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cerr << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
             }
-            std::cerr << "##EE##" << std::endl;
+            std::cerr << "##EE##" << std::endl;*/
         } else if (layer_def.type() == "FC") {
             string input_name = layer_def.input(0);
             string output_name = layer_def.output(0);
@@ -110,11 +110,11 @@ void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::Ten
             net_tensors[w_name] = Wb.first;
             net_tensors[b_name] = Wb.second;
             net_outputs[output_name] = std::make_shared<FCLayer>(net_tensors[w_name], net_tensors[b_name], net_outputs[flatten_name]);
-            std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
+            /*std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cerr << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
             }
-            std::cerr << "##EE##" << std::endl;       
+            std::cerr << "##EE##" << std::endl;*/       
         } else if (layer_def.type() == "LRN") {
 
         } else if (layer_def.type() == "DepthConcat") {
@@ -132,11 +132,11 @@ void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::Ten
             string output_name = layer_def.output(0);
 
             net_outputs[output_name] = std::make_shared<FlattenLayer>(net_outputs[input_name]);
-            std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
+            /*std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cerr << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
             }
-            std::cerr << "##EE##" << std::endl;
+            std::cerr << "##EE##" << std::endl;*/
         } else if (layer_def.type() == "Concat") {
             std::vector<std::shared_ptr<AbstractLayer>> inputs;
             for (int l_idx = 0; l_idx < layer_def.input_size(); ++l_idx) {
@@ -147,11 +147,11 @@ void Net::ParseAndCreateNetwork(const caffe2::NetDef& network, const caffe2::Ten
             string output_name = layer_def.output(0);
 
             net_outputs[output_name] = std::make_shared<ConcatLayer>(inputs);
-            std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
+            /*std::cerr << "##NN## " <<  net_outputs[output_name]->out_dims() << std::endl;
             for (int tt = 0; tt < net_outputs[output_name]->out_dims(); ++tt) {
                 std::cerr << "\t" << net_outputs[output_name]->out_dim_size(tt) << std::endl;
             }
-            std::cerr << "##EE##" << std::endl;
+            std::cerr << "##EE##" << std::endl;*/
         } else {
             // LOG_ASSERT(false) << "Unimplemented layer" << std::endl;
             return;
@@ -179,7 +179,7 @@ void Net::LoadWeights(const string& network_weights, bool binary) {
     std::fstream input_weights(network_weights, flags);
     caffe2::NetDef def;
     def.ParseFromIstream(&input_weights);
-    float max_weight = 0;
+    //float max_weight = 0;
     //weights.InitAsDefaultInstance();
     for (int op_idx = 0; op_idx < def.op_size(); ++op_idx) {
         auto operation_def = def.op(op_idx);
@@ -192,11 +192,11 @@ void Net::LoadWeights(const string& network_weights, bool binary) {
         }
         tensor->clear_float_data();
         for (int i = 0; i < operation_def.arg(1).floats_size(); ++i) {
-            max_weight = std::max(max_weight, abs(operation_def.arg(1).floats(i)));
+            // max_weight = std::max(max_weight, abs(operation_def.arg(1).floats(i)));
             tensor->add_float_data(operation_def.arg(1).floats(i));
         }
     }
-    std::cerr << "Maximum weight is: " << max_weight << std::endl;
+    // std::cerr << "Maximum weight is: " << max_weight << std::endl;
 }
 
 void Net::ReadImage(const std::string& image_path) {
@@ -214,16 +214,16 @@ void Net::ReadImage(const std::string& image_path) {
     params.h = image.extent(1);
     params.channels = image.extent(2);
     Halide::Buffer<float> fimage(params.w, params.h, params.channels);
-    std::cerr << "inp_image" << std::endl;
+    // std::cerr << "inp_image" << std::endl;
     for (size_t i = 0; i < params.w; ++i) {
         for (size_t j = 0; j < params.h; ++j) {
             for (size_t c = 0; c < params.channels; ++c) {
                 fimage(i, j, c) = 1.0f * image(i, j, c);
-                std::cerr << "[" << fimage(i, j, c) << ", " << image(i, j, c) << "]" <<  " ";
+                //std::cerr << "[" << fimage(i, j, c) << ", " << image(i, j, c) << "]" <<  " ";
             }
         }
     }
-    std::cerr << std::endl;
+    //std::cerr << std::endl;
     
     net_outputs["data"] = std::make_shared<DataLayer>(fimage, params);
 }
@@ -234,24 +234,24 @@ void Net::Init() {
         std::cerr << elem.first << std::endl;
     }
     //std::cerr << net_outputs["prob"]->out_dims();
-    std::cerr << "GOOD" << std::endl;
+    //std::cerr << "GOOD" << std::endl;
 }
 
 std::pair<float, int> Net::GetResults() {
     Halide::Buffer<float> results = net_outputs["prob"]->forward.realize(1, 1000);
 
-    Halide::Buffer<float> tmp_results = net_outputs["prob"]->input_layer->forward.realize(1, 1000);
+    /*Halide::Buffer<float> tmp_results = net_outputs["prob"]->input_layer->forward.realize(1, 1000);
     for (size_t i = 0; i < 1000; ++i) {
         std::cerr << tmp_results(0,i) << ", ";
     }
-    std::cerr << std::endl;
+    std::cerr << std::endl;*/
     float max_prob = 0;
     int max_prob_class = -1;
     float min_prob = 1;
     int min_prob_class = -1;
-    std::cerr << "Probs: " << std::endl;
+    //std::cerr << "Probs: " << std::endl;
     for (size_t i = 0; i < 1000; ++i) {
-        std::cerr << results(0, i) << std::endl;
+        //std::cerr << results(0, i) << std::endl;
         if (results(0, i) > max_prob) {
             max_prob_class = i;
             max_prob = results(0, i);
@@ -261,7 +261,7 @@ std::pair<float, int> Net::GetResults() {
             min_prob = results(0, i);
         }
     }
-    std::cerr << "Min prob: " << min_prob << ", class: " << min_prob_class << std::endl;
+    //std::cerr << "Min prob: " << min_prob << ", class: " << min_prob_class << std::endl;*/
     return {max_prob, max_prob_class};
 }
 

@@ -6,9 +6,9 @@ SoftmaxLayer::SoftmaxLayer(std::shared_ptr<AbstractLayer> input, int schedule) :
     //forward.trace_stores();
     auto layer = input_layer;
     // LOG_ASSERT(layer->out_dims() == 2);
-    std::cerr << "Softmax: " << layer->out_dims() << std::endl;
+    // std::cerr << "Softmax: " << layer->out_dims() << std::endl;
     for (int i = 0; i < layer->out_dims(); ++i) {
-        std::cerr << "Dim " << i << ", " << layer->out_dim_size(i) << std::endl;
+        // std::cerr << "Dim " << i << ", " << layer->out_dim_size(i) << std::endl;
     }
 
     num_classes = layer->out_dim_size(1);

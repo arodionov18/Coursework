@@ -16,10 +16,10 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
     in_ch = input_layer_->out_dim_size(1);
     in_h = input_layer_->out_dim_size(2);
     in_w = input_layer_->out_dim_size(3);
-    std::cerr << "Convolutional layer" << std::endl;
-    std::cerr << "Params dims: " << w.dims_size() << std::endl;
+    // std::cerr << "Convolutional layer" << std::endl;
+    // std::cerr << "Params dims: " << w.dims_size() << std::endl;
     for (int i = 0; i < w.dims_size(); ++i) {
-        std::cerr << "dim " << i << ", " << w.dims(i) << std::endl;
+        // std::cerr << "dim " << i << ", " << w.dims(i) << std::endl;
     }
     f_w = w.dims(3);
     f_h = w.dims(2);
@@ -29,18 +29,18 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
     assert(num_f == b.dims(0));
 
     /*Halide::Buffer<float> debug_output = input_layer->forward.realize({1, in_ch, in_h, in_w});
-    std::cerr << "CONV LAYER" << std::endl;
+    // std::cerr << "CONV LAYER" << std::endl;
     for (size_t i = 0; i < in_ch; ++i)
     {
-        std::cerr << std::endl
+        // std::cerr << std::endl
                   << "C: " << i << std::endl;
         for (size_t j = 0; j < in_h; ++j)
         {
             for (size_t k = 0; k < in_w; ++k)
             {
-                std::cerr << debug_output(0, i, j, k) << " ";
+                // std::cerr << debug_output(0, i, j, k) << " ";
             }
-            std::cerr << std::endl;
+            // std::cerr << std::endl;
         }
     }*/
 
@@ -63,7 +63,7 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
 
     Halide::RDom r(0, f_w, 0, f_h, 0, in_ch);
 
-    forward(n, z, y, x) = cast<float>(params[1](z));
+    forward(n, z, y, x) = params[1](z);
     forward(n, z, y, x) += params[0](z, r.z, r.y, r.x) * forward_clamp(n, r.z,
                                                                        y * stride + r.y - pad,
                                                                        x * stride + r.x - pad);
@@ -72,7 +72,7 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
         o_block_size = 16;
         y_block_size = 32;
         vec_len = 8;
-        forward.update().reorder(y, x, r.z);
+        forward.update().reorder(x, y, r.z);
         // blocking spatially with vectorization
         // forward_clamp.compute_at(f_simple, n);
         forward.compute_root();

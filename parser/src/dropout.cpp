@@ -10,7 +10,7 @@ DropoutLayer::DropoutLayer(const caffe2::OperatorDef& op, std::shared_ptr<Abstra
     is_test = op.arg(1).i(); // phase
 
     Expr scale = 1.0f / (1.0f - ratio);
-    std::cerr << "is_test: " << is_test << std::endl;
+    // std::cerr << "is_test: " << is_test << std::endl;
 
     switch (layer->out_dims())
     {

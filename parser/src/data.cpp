@@ -63,6 +63,7 @@ void DataLayer::LoadNewImage(Buffer<float> img, const ImageInfo& info) {
 
     Func data = BoundaryConditions::constant_exterior(cropped_image, 0.0f, 0, num_samples, 0, in_ch, 0, in_h, 0, in_w);
     forward(n, z, y, x) = data(n, z, y, x) - 128.0f;
+    forward.compute_root().parallel(z);
 }
 
 // img in CHW format

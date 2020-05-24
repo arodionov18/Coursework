@@ -26,7 +26,7 @@ MaxPoolingLayer::MaxPoolingLayer(const caffe2::OperatorDef& op, std::shared_ptr<
     
     if (schedule) {
         forward.vectorize(x, vec_len);
-        forward.compute_root().fuse(z, n, par).parallel(par);
+        forward.compute_root().fuse(n, z, par).parallel(par);
     }
 }
 

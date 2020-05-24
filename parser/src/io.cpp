@@ -19,7 +19,7 @@ using google::protobuf::io::CodedOutputStream;
 using std::ios;
 using std::fstream;
 using std::endl;
-using std::cerr;
+using // std::cerr;
 
 bool ReadProtoFromTextFile(const string& filename, Message* proto) {
     fstream in(filename, ios::in);

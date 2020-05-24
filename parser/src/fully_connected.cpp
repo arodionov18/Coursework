@@ -8,19 +8,19 @@ FCLayer::FCLayer(const caffe2::TensorProto& w, const caffe2::TensorProto& b, std
     // forward.trace_stores();
 
     num_samples = input_layer->out_dim_size(0);
-    std::cerr << input_layer->out_dim_size(1) << std::endl;
+    // std::cerr << input_layer->out_dim_size(1) << std::endl;
     assert(input_layer->out_dim_size(1) == w.dims(1));
     out_width = w.dims(0); // (M, K) * (N, K)^T = (M, N)
     //                        (1, K) * (4096, K)^T = (1, 4096)
 
-    std::cerr << "FC: W: " << w.dims_size() << std::endl;
+    // std::cerr << "FC: W: " << w.dims_size() << std::endl;
     for (int i = 0; i < w.dims_size(); ++i) {
-        std::cerr << "dim: " << i << ", " << w.dims(i) << std::endl;
+        // std::cerr << "dim: " << i << ", " << w.dims(i) << std::endl;
     }
 
-    std::cerr << "FC: b: " << b.dims_size() << std::endl;
+    // std::cerr << "FC: b: " << b.dims_size() << std::endl;
     for (int i = 0; i < b.dims_size(); ++i) {
-        std::cerr << "dim: " << i << ", " << b.dims(i) << std::endl;
+        // std::cerr << "dim: " << i << ", " << b.dims(i) << std::endl;
     }
 
     params.push_back(LoadBufferFromTensor(w));
