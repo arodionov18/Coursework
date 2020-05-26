@@ -14,16 +14,23 @@ MaxPoolingLayer::MaxPoolingLayer(const caffe2::OperatorDef& op, std::shared_ptr<
 
     p_h = op.arg(2).i();
     p_w = op.arg(2).i(); // CHECK THIS NORMAL
+    pad = op.arg(1).i();
     stride = op.arg(0).i();
 
-    assert((in_h - p_h) % stride == 0);// << "Bad Hpad";
-    assert((in_w - p_w) % stride == 0);// << "Bad Wpad";
+    //assert((in_h - p_h + 2 * pad) % stride == 0);// << "Bad Hpad";
+    // assert((in_w - p_w + 2 * pad) % stride == 0);// << "Bad Wpad";
+
+    Func forward_clamp = BoundaryConditions::constant_exterior(layer->forward, 0.0f,
+                                                                 0, num_samples,
+                                                                 0, in_ch,
+                                                                 0, in_h,
+                                                                 0, in_w);
 
     RDom r(0, p_w, 0, p_h);
-    forward(n, z, y, x) = maximum(layer->forward(n, z,
-                                                 y * stride + r.y,
-                                                 x * stride + r.x));
-    
+    forward(n, z, y, x) = maximum(forward_clamp(n, z,
+                                                 y * stride + r.y - pad,
+                                                 x * stride + r.x - pad));
+    //forward.bound(z, 0, in_ch);
     if (schedule) {
         forward.vectorize(x, vec_len);
         forward.compute_root().fuse(n, z, par).parallel(par);
@@ -62,9 +69,9 @@ int MaxPoolingLayer::out_dim_size(int i) const {
 
     int size = 0; // NRVO
     if (i == 3) {
-        size = 1 + ((in_w - p_w) / stride);
+        size = 1 + ((in_w - p_w + 2 * pad) / stride);
     } else if (i == 2) {
-        size = 1 + ((in_h - p_h) / stride);
+        size = 1 + ((in_h - p_h + 2 * pad) / stride);
     } else if (i == 1) {
         size = in_ch;
     } else {

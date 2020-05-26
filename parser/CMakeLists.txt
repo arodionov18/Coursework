@@ -54,7 +54,9 @@ set(layers_list
     src/flatten.cpp
     src/maxpooling.cpp
     src/softmax.cpp
-    src/dropout.cpp)
+    src/dropout.cpp
+    src/average_pooling.cpp
+    src/lrn.cpp)
 
 set(HALIDE_DISTRIB_DIR ${HALIDE_PATH})
 include("${HALIDE_PATH}/halide.cmake")

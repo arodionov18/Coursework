@@ -54,7 +54,7 @@ void DataLayer::LoadNewImage(Buffer<float> img, const ImageInfo& info) {
 
     Buffer<float> cropped_image = crop_center(convert_to_bgr(rescaled_image, rescaled_info), rescaled_info);
 
-    PrintDebugImage(cropped_image, 12);
+    //PrintDebugImage(cropped_image, 12);
 
     in_h = kImageSize;
     in_w = kImageSize;

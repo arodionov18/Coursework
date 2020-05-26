@@ -31,8 +31,13 @@ FlattenLayer::FlattenLayer(std::shared_ptr<AbstractLayer> input) : AbstractLayer
                 // std::cerr << std::endl;
             } 
         }*/
+        Func clamped = BoundaryConditions::constant_exterior(layer->forward, 0.0f,
+                                                             0, num_samples,
+                                                             0, c,
+                                                             0, h,
+                                                             0, w);
 
-        forward(n, x) = layer->forward(n, x / (w * h), (x / w) % h, x % w);
+        forward(n, x) = clamped(n, x / (w * h), (x / w) % h, x % w);
     }
 
     forward.compute_root().parallel(n); // check with schedule

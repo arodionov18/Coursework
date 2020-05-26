@@ -16,16 +16,21 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
     in_ch = input_layer_->out_dim_size(1);
     in_h = input_layer_->out_dim_size(2);
     in_w = input_layer_->out_dim_size(3);
-    // std::cerr << "Convolutional layer" << std::endl;
-    // std::cerr << "Params dims: " << w.dims_size() << std::endl;
+    /*std::cerr << "Convolutional layer" << std::endl;
+    std::cerr << "Params dims: " << w.dims_size() << std::endl;
     for (int i = 0; i < w.dims_size(); ++i) {
-        // std::cerr << "dim " << i << ", " << w.dims(i) << std::endl;
-    }
+        std::cerr << "dim " << i << ", " << w.dims(i) << std::endl;
+    }*/
     f_w = w.dims(3);
     f_h = w.dims(2);
+    assert(in_ch == w.dims(1));
     num_f = w.dims(0);
     params.push_back(LoadBufferFromTensor(w)); // W(N, C, Kh, Kw)
     params.push_back(LoadBufferFromTensor(b)); // b(N)
+
+    //std::cerr << params[0].name() << std::endl;
+    //std::cerr << params[1].name() << std::endl;
+    //params[1].set_name("CONV_b");
     assert(num_f == b.dims(0));
 
     /*Halide::Buffer<float> debug_output = input_layer->forward.realize({1, in_ch, in_h, in_w});
@@ -68,13 +73,12 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
                                                                        y * stride + r.y - pad,
                                                                        x * stride + r.x - pad);
     
+    //forward.bound_extent(z, num_f);
     if (schedule) {
-        o_block_size = 16;
+        o_block_size = 8; // 16 best for vgg
         y_block_size = 32;
         vec_len = 8;
         forward.update().reorder(x, y, r.z);
-        // blocking spatially with vectorization
-        // forward_clamp.compute_at(f_simple, n);
         forward.compute_root();
         forward.fuse(z, n, par).parallel(par);
         forward.update().reorder(x, y, r.z);
@@ -86,9 +90,6 @@ ConvolutionalLayer::ConvolutionalLayer(const caffe2::TensorProto &w,
         //forward.update().fuse(y, par, par).parallel(par);
         forward.update().unroll(r.x);
         forward.update().unroll(r.y);
-        // There are performance implications to this and seems to
-        // be incompatible with some schedules. Have to investigate
-        // this more closely.
         //forward_clamp.compute_at(forward, n);
         forward_clamp.compute_at(forward, z_t);
     }

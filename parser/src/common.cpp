@@ -31,6 +31,7 @@ Halide::Buffer<float> LoadBufferFromTensor(const caffe2::TensorProto& tensor) {
                 }
             }
         }
+        image.set_name(tensor.name());
         return image;
     } else if (tensor.dims_size() == 2) {
         Halide::Buffer<float> image(number, channel);
@@ -41,12 +42,14 @@ Halide::Buffer<float> LoadBufferFromTensor(const caffe2::TensorProto& tensor) {
                 ++idx;
             }
         }
+        image.set_name(tensor.name());
         return image;
     } else {
         Halide::Buffer<float> image(channel);
         for (int c = 0; c < channel; ++c) {
             image(c) = tensor.float_data(c);
         }
+        image.set_name(tensor.name());
         return image;
     }
     //// std::cerr << tensor.name() << " finished";

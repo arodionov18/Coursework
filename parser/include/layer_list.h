@@ -9,7 +9,8 @@
 #include "relu.h"
 #include "softmax.h"
 #include "dropout.h"
-//#include "lrn.h" unimplemented
+#include "lrn.h"
+#include "average_pooling.h"
 
 // lrn
 // dropout
