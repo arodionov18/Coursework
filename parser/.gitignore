@@ -1,0 +1,11 @@
+/vgg19
+/squeezenet
+/inception_v1
+/build
+/dbuild
+/out.txt
+/release_build
+/.vscode
+*.pb
+*.jpg
+*.jpeg
