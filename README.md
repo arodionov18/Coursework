@@ -1,4 +1,4 @@
-# Samsung_Halide
+# Coursework
 
 ## Необходимые пакеты для установки
 1. Google Protobuf
